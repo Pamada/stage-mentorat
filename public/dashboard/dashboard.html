@@ -49,7 +49,7 @@
     <div class="d-flex justify-content-between align-items-center">
       <h1>Dashboard</h1>
       <div>
-        <span>Welcome, Daniela</span>
+        <span id="welcomeMessage">Welcome, </span>
       </div>
     </div>
 
@@ -65,5 +65,19 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Fetch user data from the server
+  fetch('/user-data')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Display the user's name in the welcome message
+              document.getElementById('welcomeMessage').textContent = `Welcome, ${data.user.name}`;
+            } else {
+              alert('Unable to fetch user data.');
+            }
+          });
+</script>
 </body>
 </html>
+
