@@ -1,7 +1,6 @@
+### README Update
 
 # MentorMTL - Plateforme de mentorat
- 
----
 
 MentorMTL est une plateforme de mentorat conçue pour connecter les mentors et les mentorés. La plateforme offre un tableau de bord permettant aux utilisateurs de gérer leurs sessions, d'envoyer des messages, de suivre leurs progrès et de gérer les paiements. Le développement de cette plateforme se concentre sur la mise en relation des mentorés avec des mentors dans différents domaines, tels que le coaching de carrière, le coaching de vie et l'équilibre travail-vie personnelle.
 
@@ -13,122 +12,86 @@ Le projet est développé en utilisant les technologies suivantes :
 - **Bootstrap 5.3.3** pour un design responsive
 - **JavaScript**, **HTML** et **CSS** pour la conception et l'interactivité côté front-end
 
-## Fonctionnalités
+## Modifications récentes
 
-- **Inscription Mentor et Mentoré** : Les utilisateurs peuvent s'inscrire en tant que mentor ou mentoré.
-- **Tableau de bord** : Un tableau de bord personnalisé où les utilisateurs peuvent consulter leurs sessions, mentors favoris, messages et factures.
-- **Système de messagerie** : Une boîte de réception intégrée pour la communication entre les mentors et les mentorés.
-- **Calendrier** : Les utilisateurs peuvent gérer leurs événements à venir et leurs sessions de mentorat.
-- **Liste des tâches** : Aide les mentorés et les mentors à suivre leurs tâches et objectifs.
-- **Intégration des paiements** : Permet aux mentors de facturer les sessions et de suivre les paiements.
-- **Paramètres** : Les utilisateurs peuvent mettre à jour leurs informations de profil et paramètres de compte.
+### **Intégration d'une nouvelle table `Users`**
 
-## Statut actuel
+La base de données a été mise à jour pour supprimer les tables séparées `Mentor` et `Mentoree`. Ces deux entités sont désormais intégrées dans une table unique `Users`. Un champ **userType** a été ajouté pour distinguer les mentors des mentorés.
 
-### **Modifications Récentes :**
+Cela a impacté les logiques suivantes :
+1. **Recherche** : La recherche se fait maintenant dans la table `Users`, en filtrant les résultats en fonction du `userType` (mentor ou mentoré).
+2. **Messagerie** : Les messages entre utilisateurs (qu'ils soient mentors ou mentorés) sont maintenant basés sur l'ID des utilisateurs dans la table `Users`.
+3. **Contacts** : La logique de gestion des contacts a également été ajustée pour prendre en compte cette nouvelle table unifiée.
 
-1. **Modification de la base de données** :
-   - La base de données a été simplifiée pour inclure les informations principales pour les mentors et les mentorés :
-      - **Mentor** : `name`, `email`, `password`, `expertise`.
-      - **Mentoree** : `name`, `email`, `password`.
-   - Les tables `Session`, `Demande`, et `Paiement` restent en place pour gérer les fonctionnalités futures.
+### **Changements dans la logique de recherche**
 
-2. **Installation de modules npm supplémentaires** :
-   - Le module **express-session** a été installé pour gérer les sessions des utilisateurs afin de les maintenir connectés et d'afficher leur nom dans le tableau de bord :
-     ```bash
-     npm install express-session
-     ```
+La recherche a été modifiée pour interroger la table `Users` en fonction du type d'utilisateur. Les résultats de recherche excluent l'utilisateur actuellement connecté et affichent des boutons d'action spécifiques selon les résultats :
+- **Mentor vers mentor ou mentoré vers mentoré** : Ajout du bouton `Ajouter comme ami`.
+- **Mentoré vers mentor** : Boutons `Demander un mentorat` et `Ajouter comme ami`.
+- **Mentor vers mentoré** : Boutons `Proposer un mentorat` et `Ajouter comme ami`.
 
-3. **Modification du tableau de bord** :
-   - Le tableau de bord a été modifié pour afficher le nom de l'utilisateur (mentor ou mentoré) après la connexion. Cette information est récupérée via la session active de l'utilisateur.
+Un message s'affiche si aucun utilisateur correspondant n'est trouvé.
 
-4. **Fonctionnalité future - Création de session entre Mentor et Mentoré** :
-   - Les prochaines étapes incluront la possibilité de créer des **sessions** entre les mentors et les mentorés, où un mentor pourra accepter une demande de session envoyée par un mentoré.
+### **Mise à jour de la logique de la messagerie**
 
-### **Intégration MySQL avec XAMPP sur localhost**
+La logique de messagerie a été refactorisée pour intégrer la table `Users`. Chaque utilisateur a désormais un identifiant unique dans cette table, ce qui simplifie l'envoi et la réception de messages. Un onglet pour les messages envoyés a également été ajouté, permettant aux utilisateurs de voir leurs messages envoyés.
 
-- **Hôte** : `localhost`
-- **Utilisateur** : `root` (pas de mot de passe)
-- **Port** : `3306` (port par défaut de MySQL)
-- **Base de données** : `mentorship_platform`
+Les messages sont récupérés et affichés en fonction de l'ID de l'utilisateur connecté, avec un système de popup pour lire les messages.
 
-#### **Étapes d'intégration avec MySQL via XAMPP** :
-1. **Installation et configuration** :
-   - Démarrez **XAMPP** et activez les services **Apache** et **MySQL**.
-   - Ouvrez **phpMyAdmin** en accédant à `http://localhost/phpmyadmin/`.
-   - Créez la base de données en exécutant le fichier SQL disponible dans le projet : `/sql/mentorship_platform.sql`.
+### **Nouveaux modules et dépendances**
 
-2. **Connexion à la base de données** :
-   - La connexion MySQL est définie dans le fichier `server.js` avec l'utilisateur `root` sans mot de passe, sur `localhost` avec le port `3306`.
+Un nouveau module a été ajouté pour la gestion des sessions :
+- **express-session** : pour la gestion des sessions utilisateurs lors de la connexion.
 
-3. **Gestion des utilisateurs** :
-   - L'ajout d'utilisateurs à la base de données est maintenant possible via les formulaires d'inscription des mentors et mentorés.
-   - Lorsqu'un utilisateur soumet le formulaire d'inscription, ses informations sont stockées dans les tables `Mentor` ou `Mentoree`.
-
-### **Prochaines étapes :**
-
-- **Fonction de recherche pour les mentorés** : Les mentorés pourront rechercher des mentors en fonction de leur domaine d'expertise.
-- **Envoyer des demandes** : Les mentorés pourront envoyer des demandes de sessions aux mentors.
-- **Accepter des demandes** : Les mentors pourront accepter ou refuser ces demandes.
-- **Création d'une session mentor-mentoré** : Un mentor et un mentoré pourront planifier et gérer leurs sessions directement depuis le tableau de bord.
+Installez ce module via :
+```bash
+npm install express-session
+```
 
 ## Instructions d'installation
-
-Pour exécuter le projet en local, suivez les étapes ci-dessous :
 
 1. **Cloner le dépôt** :
    ```bash
    git clone https://github.com/pamada/stage-mentorat.git
    cd mentormtl
+   ```
 
-2. **Installer les dépendances nécessaires** :
-   Assurez-vous que Node.js et npm sont installés sur votre machine, puis exécutez :
+2. **Installer les dépendances** :
    ```bash
    npm install
-   ```
-
-3. **Installer Bootstrap 5.3.3** :
-   ```bash
-   npm i bootstrap@5.3.3
-   ```
-
-4. **Installer express-session** :
-   ```bash
    npm install express-session
    ```
 
-5. **Configurer la base de données MySQL** :
-   - Assurez-vous que MySQL est installé et en cours d'exécution sur votre machine via XAMPP.
-   - Utilisez le fichier SQL fourni (`/mentorship_platform.sql`) pour créer les tables nécessaires.
-   - Mettez à jour le fichier `server.js` avec vos informations d'identification MySQL (utilisateur `root`, pas de mot de passe, port `3306`).
+3. **Configurer la base de données MySQL** :
+   - Créez la base de données avec le fichier SQL mis à jour (`mentorship_platform.sql`) qui contient la table `Users` et les relations nécessaires.
 
-6. **Exécuter l'application** :
+4. **Exécuter l'application** :
    ```bash
    node server.js
    ```
 
-7. **Ouvrir l'application dans votre navigateur** :
+5. **Ouvrir l'application dans votre navigateur** :
    Accédez à `http://localhost:4000`.
+
+## Fonctionnalités
+
+- **Inscription** : Inscription en tant que mentor ou mentoré via un formulaire.
+- **Connexion** : Connexion avec une gestion de sessions.
+- **Tableau de bord** : Accès à des fonctionnalités comme la recherche, la messagerie, et la gestion des contacts.
+- **Recherche** : Trouver des mentors ou mentorés en fonction de critères spécifiques.
+- **Messagerie** : Envoyer et recevoir des messages entre utilisateurs.
+- **Gestion des contacts** : Ajout de contacts après acceptation d'une demande d'ami ou de mentorat.
 
 ## À faire
 
-- [x] Finaliser l'intégration de la base de données MySQL
-- [x] Implémenter le chargement dynamique des données des mentors et sessions
-- [x] Ajouter une sélection dans la page de connexion pour choisir entre mentor et mentoré
-- [x] Modifier le tableau de bord pour afficher le nom de l'utilisateur connecté
-- [ ] Fonction de recherche pour les mentorés
-- [ ] Envoi de demandes pour les mentorés
-- [ ] Acceptation des demandes pour les mentors
-- [ ] Ajouter la fonctionnalité de traitement des paiements
-- [ ] Planifier et gérer des sessions entre mentors et mentorés
-- [ ] Améliorer l'interface utilisateur du tableau de bord
+- [x] Unifier les tables `Mentor` et `Mentoree` dans une table `Users`.
+- [x] Mettre à jour la logique de recherche et de messagerie.
+- [ ] Ajouter une fonctionnalité de création de session entre mentor et mentoré.
+- [ ] Finaliser la gestion des paiements.
 
 ## Contribution
 
-Si vous souhaitez contribuer à ce projet, merci de soumettre une pull request avec une description des modifications effectuées. Les retours et suggestions sont également les bienvenus !
-
+Si vous souhaitez contribuer à ce projet, soumettez une pull request avec une description des modifications effectuées.
 ## Licence
 
-
- 
- 
+Projet développé par Daniela.
